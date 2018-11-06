@@ -6,6 +6,8 @@ Clone this repo and import it as a Maven project into your IDE.
 Run `ReachingDefinitionsAnalysis` to run a reaching definition analysis on the provided `TestClass`.
 `ReachingDefinitionsAnalysis` shows an example of a dataflow analysis.
 Its output is stored as Jimple files and Dot files, as well as the Dot files rendered as PDF, if you have the `dot` program installed.
+If the execution fails with an error, you are probably on Windows and do not have `dot` installed.
+In that case you can copy the content of a `*.dot` file into an [online renderer](http://www.webgraphviz.com/).
 
 ## Exercise
 

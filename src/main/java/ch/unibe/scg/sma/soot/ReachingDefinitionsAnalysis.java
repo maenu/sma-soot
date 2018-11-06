@@ -35,13 +35,12 @@ public class ReachingDefinitionsAnalysis
 		// @formatter:off
 		// @see https://www.sable.mcgill.ca/soot/tutorial/usage/ for all command line options
 		 args = new String[] {
-				"-allow-phantom-refs", 					// use stubs for unresolved classes
-				"-print-tags-in-output",				// statements can have tags, e.g. line numbers, print
-				//"--keep-line-number",					// keep line numbers from original sources
-				"-p", "jb", "use-original-names",		// whenever possible use original local variable names in the jimple body builder phase
-				"-output-format", "none",				// output nothing
-				"--soot-class-path", "src/test/java",	// lookup classes from JAR/directory
-				"ch.unibe.scg.sma.soot.TestClass"		// analyze class
+				"-allow-phantom-refs", 						// use stubs for unresolved classes
+				"-print-tags-in-output",					// statements can have tags, e.g. line numbers, print
+				"-p", "jb", "use-original-names",			// whenever possible use original local variable names in the jimple body builder phase
+				"-output-format", "none",					// output nothing
+				"--soot-class-path", "target/test-classes",	// lookup classes from JAR/directory
+				"ch.unibe.scg.sma.soot.TestClass"			// analyze class
 		};
 		// @formatter:on
 		run(args);
@@ -81,14 +80,15 @@ public class ReachingDefinitionsAnalysis
 		ReachingDefinitionsAnalysis analysis = new ReachingDefinitionsAnalysis(unitGraph);
 		analysis.start();
 		// dump cfg
+		String signature = body.getMethod().getSignature().replaceAll("[^A-Za-z0-9_]", "_");
 		CFGToDotGraph cfgToDot = new CFGToDotGraph();
-		cfgToDot.drawCFG(unitGraph, body).plot("reaching-definitions/" + body.getMethod().getSignature() + ".dot");
+		cfgToDot.drawCFG(unitGraph, body).plot("reaching-definitions/" + signature + ".dot");
 		// dump raw body
 		for (Unit unit : body.getUnits()) {
 			unit.removeAllTags();
 		}
 		Files.write(body.toString().replaceAll("\n+", "\n"),
-				new File("reaching-definitions/" + body.getMethod().getSignature() + "-raw.jimple"), Charsets.UTF_8);
+				new File("reaching-definitions/" + signature + "-raw.jimple"), Charsets.UTF_8);
 		// dump reaching definitions body
 		for (Unit unit : body.getUnits()) {
 			List<String> reachingDefinitions = analysis.getReachingDefinitionsAt(unit).stream().map(Object::toString)
@@ -98,8 +98,7 @@ public class ReachingDefinitionsAnalysis
 			unit.addTag(new StringTag("\n    " + output + "\n"));
 		}
 		Files.write(body.toString().replaceAll("\n+", "\n"),
-				new File("reaching-definitions/" + body.getMethod().getSignature() + "-reaching-definitions.jimple"),
-				Charsets.UTF_8);
+				new File("reaching-definitions/" + signature + "-reaching-definitions.jimple"), Charsets.UTF_8);
 	}
 
 	/**
